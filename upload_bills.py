@@ -103,6 +103,9 @@ def get_links(array):
         except:
             print(item)
     return d
+
+
+
 class Bills():
     
     my_schema = n.schema()
