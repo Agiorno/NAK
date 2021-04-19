@@ -2,11 +2,14 @@ import requests
 from bottle import Bottle, response, request as bottle_request
 from nak_bill_analize import NAK
 from bothandler import BotHandler
+import ast
 
+with open("monkey", "r") as f:
+    bot = ast.literal_eval(f.read())
 
 class TelegramBot(BotHandler, Bottle):  
    
-    BOT_URL = 'https://api.telegram.org/bot1200141862:AAE3YD6hY9GJBJ5o8JU-GjKn570vujltz1k/'
+    BOT_URL = bot['BOT_URL']
     
 
     def __init__(self, *args, **kwargs):
