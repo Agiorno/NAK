@@ -3,12 +3,19 @@ import json
 
 class BotHandler:  
     BOT_URL = None
-   
+    last_message = 'restart'
     
     def handle_data(self):
         try:
             self.chat_id = self.data['message']['chat']['id']
             self.message = self.data['message']['text']
+            if self.last_message == self.message:
+                if self.last_message == 'restart':
+                    self.message = 'restart succeed'
+                    
+            else:
+                self.last_message = self.message
+
             self.message_id = self.data['message']['message_id']
             self._type = 'message'
            

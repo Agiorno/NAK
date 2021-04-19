@@ -3,6 +3,8 @@ from bottle import Bottle, response, request as bottle_request
 from nak_bill_analize import NAK
 from bothandler import BotHandler
 import ast
+import sys
+import os
 
 with open("monkey", "r") as f:
     bot = ast.literal_eval(f.read())
@@ -24,14 +26,28 @@ class TelegramBot(BotHandler, Bottle):
         }
         return json_data
 
+
+    def restart(self):
+
+        print("argv was",sys.argv)
+        print("sys.executable was", sys.executable)
+        os.execv(sys.executable, ['python'] + sys.argv)		
     def post_handler(self):
         
         self.data = bottle_request.json
         self.handle_data()
-        nak = NAK(self.data)
-        nak.BOT_URL = self.BOT_URL
-        nak.bot_analize_bills_for_nak()
-        
+        if self.message == 'restart':
+            self.send_message(self.just_text('сервер перезагружается, подождите'))
+            print(f'message = {self.message}')
+            print(f'last_ message = {self.last_message}')
+            self.restart()
+        elif self.message == 'restart succeed':
+            self.send_message(self.just_text('перезагрузка сервера прошла успешно'))
+        else:
+            nak = NAK(self.data)
+            nak.BOT_URL = self.BOT_URL
+            nak.bot_analize_bills_for_nak()
+            
 
 
 
