@@ -1,5 +1,6 @@
 import os
 from analizator import Analizator, get_links, get_atrrs
+from additional_bill_info import billProject
        
 
 class Answer():
@@ -8,9 +9,10 @@ class Answer():
         self.answer = Analizator(link, 'tags')
         self.law_number = get_atrrs(link)[1]
         self.law_name = get_atrrs(link)[0]
-        self.info_message = info_message = f'''✏️ *Назва*: {self.law_name}
+        self.info_message = info_message = f'''📑 *Номер*:  🔗[{self.law_number}]({link})
         
-📑 *Номер*:  🔗[{self.law_number}]({link})'''
+✏️ *Назва*: {self.law_name}
+'''
         
         if self.answer.status == 'ok':
             
@@ -29,6 +31,12 @@ class Answer():
 
         else:
             self.my_message = self.wrong_format_answer()
+
+        self.my_message = f'''{self.my_message}
+
+{billProject(link).chronology}
+
+{billProject(link).committee}'''
             
     def docx_answer(self):
         if len(self.answer.result)==0:

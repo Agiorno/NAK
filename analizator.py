@@ -15,7 +15,7 @@ class Analizator:
         self.tag_file = tag_file
         with open(self.tag_file, 'r') as f:
             tags = f.read()
-        self.tags = tags.replace('\n',', ').lower().split(',')
+        self.tags = tags.replace('\n',',').lower().strip().split(',')
 
         r = requests.get(self.link)
         soup = bs(r.text, 'html.parser')
@@ -40,44 +40,47 @@ class Analizator:
             for i in li:
                 if i.find('проект')>=0:
                     num = li.index(i)
-            self.file_link = 'http://w1.c1.rada.gov.ua/pls/zweb2/'+lis[num].find('a')['href']
+            try:
+                path = lis[num].find('a')['href']
+                self.file_link = 'http://w1.c1.rada.gov.ua/pls/zweb2/'+path
 
-
-            
-            the_book = requests.get(self.file_link, stream=True)
-            
-            extension = the_book.headers['Content-Disposition'].split('"')[1].split('.')[1]
-            if extension == 'rtf':
-                self.status = 'rtf'
-            elif extension == 'docx' or extension =='doc':
-                with open('text.docx', 'wb') as f:
-                    for chunk in the_book.iter_content(1024 * 1024 * 2):  # 2 MB chunks
-                        f.write(chunk)
-
-                file = docx2txt.process('text.docx')
-
-                self.file = file.replace('\n',' ').replace('\t','').replace('\xa0','').lower()
-
-                result = []
-                for tag in self.tags:
-                    position  = self.file.find(tag)
-                    if position>=0:
-                        q = ''
-                        for i in tag.split():
-                            q=q+i.capitalize()
-                        tag = '#'+q.strip()
-                        tag = tag.replace(tag[0], tag[0].lower(), 1)
-                        result.append(tag)
-                self.status = 'ok'
-                self.result = result
-            elif extension == 'pdf':
-                self.status = 'pdf'
-            else:
-                self.status = 'wrong extension'
+                the_book = requests.get(self.file_link, stream=True)
                 
+                extension = the_book.headers['Content-Disposition'].split('"')[1].split('.')[1]
+                if extension == 'rtf':
+                    self.status = 'rtf'
+                elif extension == 'docx' or extension =='doc':
+                    with open('text.docx', 'wb') as f:
+                        for chunk in the_book.iter_content(1024 * 1024 * 2):  # 2 MB chunks
+                            f.write(chunk)
+
+                    file = docx2txt.process('text.docx')
+
+                    self.file = file.replace('\n',' ').replace('\t','').replace('\xa0','').lower()
+
+                    result = []
+                    for tag in self.tags:
+                        position  = self.file.find(tag)
+                        if position>=0:
+                            q = ''
+                            for i in tag.split():
+                                q=q+i.capitalize()
+                            tag = '#'+q.strip()
+                            tag = tag.replace(tag[0], tag[0].lower(), 1)
+                            result.append(tag)
+                    self.status = 'ok'
+                    self.result = result
+                elif extension == 'pdf':
+                    self.status = 'pdf'
+                else:
+                    self.status = 'wrong extension'
+            except TypeError:
+                self.status = 'no_file'
+                # print('ERROR: No file has attached')    
    
         except:
             self.status = 'error'
+        
         print(self.status)
 
 def get_links(num):

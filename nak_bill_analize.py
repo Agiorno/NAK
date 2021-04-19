@@ -27,13 +27,15 @@ class NAK(BotHandler):
                             [
                                 { "text": "Додати", "callback_data": "1" },
                                 { "text": "Не додавати", "callback_data": "2" }
+                                # { "text": "Автори", "callback_data": "3" }
+
                             ]
                         ]
                     }
                 )
             my_message = f'''{my_answer}
 
-    📍 *CRM*: {self.text}''' 
+📍 *CRM*: {self.text}''' 
 
             return my_message
 
@@ -94,16 +96,21 @@ class NAK(BotHandler):
 
 
         else:
+            try:
 
-            if self.message == "1":
-                url = self.get_url()
-                send_info(url)
-                self.send_message(self.just_text('Законопроект доданий до CRM в розділ *Bills* (Постійний моніторинг).'))
+                if self.message == "1":
+                    url = self.get_url()
+                    send_info(url)
+                    self.send_message(self.just_text('Законопроект доданий до CRM в розділ *Bills* (Постійний моніторинг).'))
+                    self.bill = Bills()
+
+                else:
+                    self.send_message(self.just_text('Законопроект не включений до постійного моніторінгу'))
+
+                self.edit_reply()
+                print('keyboard has removed')
                 self.bill = Bills()
+            
+            except KeyError:
 
-            else:
-                self.send_message(self.just_text('OK'))
-
-            self.edit_reply()
-            print('keyboard has removed')
-            self.bill = Bills()
+                 self.send_message(self.just_text('НЕКОРЕКТНИЙ ЗАПИТ'))

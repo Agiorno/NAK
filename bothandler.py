@@ -8,7 +8,10 @@ class BotHandler:
     def handle_data(self):
         try:
             self.chat_id = self.data['message']['chat']['id']
-            self.message = self.data['message']['text']
+            try:
+                self.message = self.data['message']['text']
+            except:
+                self.message = 'mne prislali hernu'
             if self.last_message == self.message:
                 if self.last_message == 'restart':
                     self.message = 'restart succeed'
@@ -20,10 +23,13 @@ class BotHandler:
             self._type = 'message'
            
         except KeyError:
-            self.chat_id = self.data['callback_query']['message']['chat']['id']
-            self.message = self.data['callback_query']['data']
-            self.message_id = self.data['callback_query']['message']['message_id']
-            self._type = 'callback_query'
+            try:
+                self.chat_id = self.data['callback_query']['message']['chat']['id']
+                self.message = self.data['callback_query']['data']
+                self.message_id = self.data['callback_query']['message']['message_id']
+                self._type = 'callback_query'
+            except:
+                print(self.data)
     
     def send_message(self, prepared_data):
         message_url = self.BOT_URL + 'sendMessage'

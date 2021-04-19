@@ -43,6 +43,22 @@ class TelegramBot(BotHandler, Bottle):
             self.restart()
         elif self.message == 'restart succeed':
             self.send_message(self.just_text('перезагрузка сервера прошла успешно'))
+        elif self.message == 'mne prislali hernu':
+            self.send_message(self.just_text('Шановні колеги, не балуйтесь. Які стікери?! Ви шо!! Використовуйте мене за призначенням'))
+        elif self.message == 'photophoto':
+            domain = 'https://esp.ngrok.io/'
+            file_name = '4050_table.png'
+            file_path = domain+file_name
+            message = f'{self.BOT_URL}sendPhoto'
+            # message_url = self.BOT_URL + 'sendMessage'
+            # self.response = requests.post(message_url, json=prepared_data)
+            json_data = {
+                "chat_id": self.chat_id,
+                "caption": "4550",
+                "photo": file_path
+            }
+
+            sssend = requests.post(message, json = json_data)
         else:
             nak = NAK(self.data)
             nak.BOT_URL = self.BOT_URL
