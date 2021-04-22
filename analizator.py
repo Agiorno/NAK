@@ -11,6 +11,7 @@ class Analizator(AnalizatorMethod):
        
         try:
             file_link = self.check_if_file_exist(soup)
+            self.file_link = file_link
             
             if file_link != '':
                 the_file = requests.get(file_link, stream=True)
