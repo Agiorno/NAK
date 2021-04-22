@@ -3,3 +3,5 @@ monkey
 tags
 nak_venv
 __*
+.ipy*
+*.ipynb

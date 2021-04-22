@@ -1,6 +1,7 @@
 import requests
 from bottle import Bottle, response, request as bottle_request
 from nak_bill_analize import NAK
+from check_updates import CheckNewBills
 from bothandler import BotHandler
 import ast
 import sys
@@ -32,6 +33,7 @@ class TelegramBot(BotHandler, Bottle):
         print("argv was",sys.argv)
         print("sys.executable was", sys.executable)
         os.execv(sys.executable, ['python'] + sys.argv)		
+    
     def post_handler(self):
         
         self.data = bottle_request.json
@@ -59,6 +61,10 @@ class TelegramBot(BotHandler, Bottle):
             }
 
             sssend = requests.post(message, json = json_data)
+        elif self.message == 'update bills':
+            c = CheckNewBills()
+            message = c.check_everything()
+            self.send_message(self.just_text(message))
         else:
             nak = NAK(self.data)
             nak.BOT_URL = self.BOT_URL

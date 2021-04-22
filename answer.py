@@ -1,43 +1,10 @@
-import os
-from analizator import Analizator, get_links, get_atrrs
+from analizator import Analizator
 from additional_bill_info import billProject
+from methods_analizator import AnalizatorMethod as am
        
 
-class Answer():
-    
-    def __init__(self, link):
-        self.answer = Analizator(link, 'tags')
-        self.law_number = get_atrrs(link)[1]
-        self.law_name = get_atrrs(link)[0]
-        self.info_message = info_message = f'''📑 *Номер*:  🔗[{self.law_number}]({link})
-        
-✏️ *Назва*: {self.law_name}
-'''
-        
-        if self.answer.status == 'ok':
-            
-            self.my_message = self.docx_answer()
-            os.remove('text.docx')
+class AnswerMethod:
 
-        elif self.answer.status == 'error':
-            self.my_message = self.docx_answer()
-            
-        elif self.answer.status == 'rtf':
-            self.my_message = self.rtf_answer()
-            
-            
-        elif self.answer.status == 'pdf':
-            self.my_message = self.pdf_answer()
-
-        else:
-            self.my_message = self.wrong_format_answer()
-
-        self.my_message = f'''{self.my_message}
-
-{billProject(link).chronology}
-
-{billProject(link).committee}'''
-            
     def docx_answer(self):
         if len(self.answer.result)==0:
             my_message = f"""{self.info_message} 
@@ -78,3 +45,53 @@ class Answer():
 *Аналіз тегів*: ❌ Неможливо опрацювати текст законопроекту. [Перевірте особисто]({self.answer.file_link})"""
         
         return my_message
+
+    def no_file(self):
+        
+        my_message = f"""{self.info_message} 
+*Аналіз тегів*: ❌ Текст законопроекту відсутній. Ми щогодини оновлюємо інформацію та повідомимо вас, після аналізу тексту, якщо в ньому будуть знайдені ключові слова."""
+        
+        return my_message
+
+
+
+class Answer(AnswerMethod):
+   
+    def __init__(self, link):
+        self.answer = Analizator(link)
+        self.law_name, self.law_number = am().get_atrrs(link)
+        self.info_message = info_message = f'''📑 *Номер*:  🔗[{self.law_number}]({link})
+        
+✏️ *Назва*: {self.law_name}
+'''
+        
+        if self.answer.status == 'ok':
+            
+            self.my_message = self.docx_answer()
+           
+
+        elif self.answer.status == 'error':
+            self.my_message = self.docx_answer()
+            
+        elif self.answer.status == 'rtf':
+            self.my_message = self.rtf_answer()
+            
+            
+        elif self.answer.status == 'pdf':
+            self.my_message = self.pdf_answer()
+        
+        elif self.answer.status == 'no_file':
+            self.my_message = self.no_file()
+
+        else:
+            self.my_message = self.wrong_format_answer()
+
+        self.my_message = f'''{self.my_message}
+
+{billProject(link).chronology}
+
+{billProject(link).committee}'''
+            
+    
+    
+    
