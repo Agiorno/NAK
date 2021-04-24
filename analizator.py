@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup as bs
 from methods_analizator import AnalizatorMethod
 
 
+
 class Analizator(AnalizatorMethod):
     
     def __init__(self, link):

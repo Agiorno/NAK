@@ -2,8 +2,11 @@ import requests
 from bs4 import BeautifulSoup as bs
 from analizator import Analizator
 from methods_analizator import AnalizatorMethod
+import ninox_log as nl
+from time import sleep
 
 class CheckNewBills(AnalizatorMethod):
+
     def __init__(self):
 
         link = self.make_concat_search_link()
@@ -30,30 +33,51 @@ class CheckNewBills(AnalizatorMethod):
 
         return links
 
+
     def check_links(self, links):
         
         self.to_check = []
         self.no_tags = []
         self.with_tags = []
         self.pdf = []
+        self.exception_links = []
 
+        e=1
+        print(f'len links = {len(links)}')
         for i in links:
-            a = Analizator(i['link'])
-            if a.status == 'no_file':
-                self.to_check.append(i)
-            elif a.status == 'pdf':
-                self.pdf.append(i)
-            elif a.status == 'ok':
-                if len(a.result) == 0:
-                    self.no_tags.append(i)
+            try:
+                if e % 10 ==0:
+                    sleep(2)
+                a = Analizator(i['link'])
+                if a.status == 'no_file':
+                    self.to_check.append(i)
+                elif a.status == 'pdf' or a.status == 'rtf':
+                    self.pdf.append(i)
+                elif a.status == 'ok':
+                    if len(a.result) == 0:
+                        self.no_tags.append(i)
+                    else:
+                        q = {'link': i, 'tags':a.result}
+                        self.with_tags.append(q)
                 else:
-                    q = {'link': i, 'tags':a.result}
-                    self.with_tags.append(q)
+                    pass
+                e+=1
+            except Exception as ex:
+                print(ex)
+                print(e)
+                self.exception_links.append(i)
+                e+=1
+        if len(self.pdf)>0:
+            print(nl.send_file_to_check(self.pdf))
+
+
+
 
         print(f'need_to_check -> {len(self.to_check)}')
         print(f'with no tags -> {len(self.no_tags)}')
         print(f'with tags -> {len(self.with_tags)}')
         print(f'pdf -> {len(self.pdf)}')
+        print(f'exceptions -> {len(self.exception_links)}')
 
     def check_everything(self):
         links = self.check_tags_in_names()

@@ -2,15 +2,15 @@ from ninox_log import send_log
 from upload_bills import get_links, send_info, Bills
 import json  
 from answer import Answer
-from bothandler import BotHandler
+from update import Update
 
-class NAK(BotHandler):
+class NAK(Update):
     
-    BOT_URL = None
-    
-    def __init__(self, data):
+    def __init__(self, bot_url, data):
+        self.BOT_URL = bot_url
         self.data = data
-        self.handle_data()
+        self.start()
+        self.bot_analize_bills_for_nak()
 
     def generate_keyboard(self, bill, my_answer):
             if str(self.message) in bill.list_of_bills:
@@ -79,7 +79,7 @@ class NAK(BotHandler):
     
     def bot_analize_bills_for_nak(self):
 
-        if  self._type == 'message':
+        if  self.my_type == 'message':
             array = get_links(self.message)
 
             if len(array)==0:
@@ -88,16 +88,14 @@ class NAK(BotHandler):
             else:
 
                 for i in array:
-
                     answer_data = self.prepare_data_for_answer1(i)
                     self.send_message(answer_data)
                     print('message has sent')
 
 
 
-        else:
+        elif self.my_type == 'callback_query':
             try:
-
                 if self.message == "1":
                     url = self.get_url()
                     send_info(url)
@@ -114,3 +112,5 @@ class NAK(BotHandler):
             except KeyError:
 
                  self.send_message(self.just_text('НЕКОРЕКТНИЙ ЗАПИТ'))
+        else:
+            pass

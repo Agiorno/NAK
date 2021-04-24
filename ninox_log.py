@@ -6,15 +6,26 @@ from ninox import Ninox
 with open("monkey", "r") as f:
     password = ast.literal_eval(f.read())
 try:
-    n = Ninox(password['Anton'], )
+    n = Ninox(password['Anton'])
     n.team = n.get_team()['NAK']
     n.database = n.get_database()['BOT']
     my_schema = n.schema()
 except:
-    n = Ninox(password['Nadin'], )
+    n = Ninox(password['Nadin'])
     n.team = n.get_team()['NAK']
     n.database = n.get_database()['BOT']
     my_schema = n.schema()
+
+try:
+    q = Ninox(password['Anton'])
+    q.team = q.get_team()['NAK']
+    q.database = q.get_database()['CRM']
+    q_schema = q.schema()
+except:
+    q = Ninox(password['Nadin'])
+    q.team = q.get_team()['NAK']
+    q.database = q.get_database()['CRM']
+    q_schema = q.schema()
     
 def send_log(data, answer, law_name, law_number, link):
     message = data['message']['text']
@@ -39,4 +50,17 @@ def send_log(data, answer, law_name, law_number, link):
     result = n.send_to_ninox(dogs, my_schema['log'])
     
     return result
+
+
+def send_file_to_check(array):
+
+    dogs = []
+    for i in array:
+        i.pop('tags')
+        di = {'fields':i}
+        dogs.append(di)
+    result = q.send_to_ninox(dogs, q_schema['PDF'])
+    return result
+    
+    
 
