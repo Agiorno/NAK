@@ -3,6 +3,7 @@ from nak import NAK
 import sys
 import os
 from datetime import datetime
+from check_updates import CheckNewBills 
  
  
 class KeyWords(Update): 

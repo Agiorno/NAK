@@ -25,20 +25,6 @@ class AnswerMethod:
         
         return my_message
     
-    def rtf_answer(self):
-        
-        my_message = f"""{self.info_message} 
-*Аналіз тегів*: ❌ Знайдено текст, проте бот _не може_ аналізувати .rtf файли. [Передивіться особисто.]({self.answer.file_link})"""
-        
-        return my_message
-    
-    def pdf_answer(self):
-        
-        my_message = f"""{self.info_message} 
-*Аналіз тегів*: ❌ Знайдено текст, проте бот _не може_ аналізувати .pdf файли. [Передивіться особисто.]({self.answer.file_link})"""
-        
-        return my_message
-    
     def wrong_format_answer(self):
         
         my_message = f"""{self.info_message} 
@@ -72,13 +58,6 @@ class Answer(AnswerMethod):
 
         elif self.answer.status == 'error':
             self.my_message = self.docx_answer()
-            
-        elif self.answer.status == 'rtf':
-            self.my_message = self.rtf_answer()
-            
-            
-        elif self.answer.status == 'pdf':
-            self.my_message = self.pdf_answer()
         
         elif self.answer.status == 'no_file':
             self.my_message = self.no_file()

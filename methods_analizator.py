@@ -6,6 +6,9 @@ from bs4 import BeautifulSoup as bs
 from datetime import date
 from time import sleep
 import concurrent.futures as cf
+from pdf2docx import parse
+import codecs
+from striprtf.striprtf import rtf_to_text
 
 class AnalizatorMethod:
 
@@ -18,12 +21,9 @@ class AnalizatorMethod:
     root = 'http://w1.c1.rada.gov.ua/pls/zweb2/'
 
     def make_soup(self, link):
-        print(f'link={link}')
         r = requests.get(link, timeout=1)
         soup = bs(r.text, 'html.parser')
-        print('soup is ready')
         return soup
-        
 
     def check_if_file_exist(self, soup):
         dts = []
@@ -45,30 +45,6 @@ class AnalizatorMethod:
             file_link = ''
         return file_link
 
-    def get_extension(self, response):
-
-        extension = response.headers['Content-Disposition'].split('"')[1].split('.')[1]
-        
-        return extension
-
-    def docx_analize(self, _file):
-
-        with open('text.docx', 'wb') as f:
-                for chunk in _file.iter_content(1024 * 1024 * 2):  # 2 MB chunks
-                    f.write(chunk)
-        
-        my_file = docx2txt.process('text.docx')
-        
-
-        my_file = my_file.replace('\n',' ').replace('\t','').replace('\xa0','').lower()
-        
-
-        result = self.find_tags(my_file)
-        
-        os.remove('text.docx')
-        
-        return result
-    
     def make_concat_search_link(self, date_finish='',date_start=None):
         link = self.make_search_link(date_finish='',date_start=None)
         r = requests.get(link, timeout=1)

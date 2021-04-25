@@ -27,9 +27,9 @@ class CheckNewBills(AnalizatorMethod):
             else:
                 with_tags+=1
             links.append(my_dict)
-            print(f'links -> {len(links)}')
-            print(f'names with no tags -> {no_tags}')
-            print(f'names with tags -> {with_tags}')
+        print(f'links -> {len(links)}')
+        print(f'names with no tags -> {no_tags}')
+        print(f'names with tags -> {with_tags}')
 
         return links
 

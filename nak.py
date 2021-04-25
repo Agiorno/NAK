@@ -90,7 +90,7 @@ class NAK(Update):
                 for i in array:
                     answer_data = self.prepare_data_for_answer1(i)
                     self.send_message(answer_data)
-                    print('message has sent')
+                    print('[НАК]: СООБЩЕНИЕ ОТПРАВЛЕНО УСПЕШНО')
 
 
 
@@ -106,7 +106,7 @@ class NAK(Update):
                     self.send_message(self.just_text('Законопроект не включений до постійного моніторінгу'))
 
                 self.edit_reply()
-                print('keyboard has removed')
+                print('[НАК]: КЛАВИАТУРА УДАЛЕНА')
                 self.bill = Bills()
             
             except KeyError:

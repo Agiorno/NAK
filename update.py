@@ -11,11 +11,9 @@ class Update:
     
     def start(self):
         self.update_id = self.data['update_id']
-        print(f'update id = {self.update_id}')
         self.my_type = self.get_type(self.data)
         print(f'type =  = {self.my_type}')
         self.handle_message(self.data)
-        print(f'message = {self.message}')
  
     def get_type(self, val):
         option = list(val.keys())[-1]
