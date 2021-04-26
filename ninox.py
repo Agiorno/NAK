@@ -25,23 +25,6 @@ class Ninox():
         response = requests.request(
             "POST", url, headers=self.ninox_headers, data=payload.encode('utf-8'))
         return response
-
-#     def get_from_ninox(self, table, json=False, page=None, filters=None):
-#         url = 'https://api.ninoxdb.de/v1/teams/%s/databases/%s/tables/%s/records/?perPage=10000' % (self.team, self.database, table)
-#         response = requests.request("GET", url, headers=self.ninox_headers)
-#         a = response.json()
-#         b = pd.json_normalize(a)
-#         b.drop(['sequence', 'createdAt', 'createdBy', 'modifiedAt', 'modifiedBy'], 1, inplace=True)
-#         cols = []
-#         for i in b.columns.to_list():
-#             cols.append(i.replace('fields.','').strip())
-#         b.columns = cols
-#         if json == False:
-#             result = b
-#         else:
-#             result = a
-#         return result
-    
     
     def get_from_ninox(self, table, json=False,custom_url = None, page=None):
         if page:
@@ -82,6 +65,16 @@ class Ninox():
         b = pd.json_normalize(a)
         schem = b.set_index('name').to_dict('dict')['id']
         return schem
+    
+    def get_single_record(self, table, _id):
+        url = f'https://api.ninoxdb.de/v1/teams/{self.team}/databases/{self.database}/tables/{table}/records/{_id}'
+        response = requests.request("GET", url, headers=self.ninox_headers).json()
+        for i in ['sequence', 'createdAt', 'createdBy', 'modifiedAt', 'modifiedBy']:
+            try:
+                response.pop(i)
+            except:
+                continue
+        return response
 
     def odd(self, num):
         if (num % 2) == 0:
@@ -91,3 +84,8 @@ class Ninox():
         return a
     def used_links(self):
         return self.get_from_ninox(self.schema()['Voting'])['URL_votes'].dropna().to_list()
+    
+    def delete_record(self, table, _id):
+        url = f'https://api.ninoxdb.de/v1/teams/{self.team}/databases/{self.database}/tables/{table}/records/{_id}'
+        response = requests.request("DELETE", url, headers=self.ninox_headers)
+        return response

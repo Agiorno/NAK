@@ -80,18 +80,20 @@ class NAK(Update):
     def bot_analize_bills_for_nak(self):
 
         if  self.my_type == 'message':
-            array = get_links(self.message)
+            if len(self.message)>3:
+                array = get_links(self.message)
 
-            if len(array)==0:
-                self.send_message(self.just_text('НЕКОРЕКТНИЙ ЗАПИТ'))
+                if len(array)==0:
+                    self.send_message(self.just_text('НЕКОРЕКТНИЙ ЗАПИТ'))
 
+                else:
+
+                    for i in array:
+                        answer_data = self.prepare_data_for_answer1(i)
+                        self.send_message(answer_data)
+                        print('[НАК]: СООБЩЕНИЕ ОТПРАВЛЕНО УСПЕШНО')
             else:
-
-                for i in array:
-                    answer_data = self.prepare_data_for_answer1(i)
-                    self.send_message(answer_data)
-                    print('[НАК]: СООБЩЕНИЕ ОТПРАВЛЕНО УСПЕШНО')
-
+                self.send_message(self.just_text('НЕКОРЕКТНИЙ ЗАПИТ'))
 
 
         elif self.my_type == 'callback_query':

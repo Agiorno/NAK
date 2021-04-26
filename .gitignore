@@ -5,3 +5,4 @@ nak_venv
 __*
 .ipy*
 *.ipynb
+*.txt

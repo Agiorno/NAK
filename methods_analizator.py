@@ -3,7 +3,7 @@ import requests
 import os
 import urllib.parse
 from bs4 import BeautifulSoup as bs
-from datetime import date
+from datetime import date, timedelta
 from time import sleep
 import concurrent.futures as cf
 from pdf2docx import parse
@@ -45,8 +45,8 @@ class AnalizatorMethod:
             file_link = ''
         return file_link
 
-    def make_concat_search_link(self, date_finish='',date_start=None):
-        link = self.make_search_link(date_finish='',date_start=None)
+    def make_concat_search_link(self, date_finish='',date_start=None, yesterday = False):
+        link = self.make_search_link(date_finish='',date_start=None, yesterday = False)
         r = requests.get(link, timeout=1)
         soup = bs(r.text, 'html.parser')
         cnt = soup.find('div', attrs= {'class':'information_block_ins'}).find('a').text.split(': ')[1].strip()
@@ -54,11 +54,14 @@ class AnalizatorMethod:
         link = f'{link}&page={page}&zp_cnt={cnt}'
         return link
 
-    def make_search_link(self, date_start=None, date_finish = ''):
+    def make_search_link(self, yesterday = False, date_start=None, date_finish = ''):
         if date_start == None:
             today = date.today()
-            my_date = today.strftime('%m.%Y') 
-            date_start = f'01.{my_date}'
+            yesterday = today - timedelta(days=1)
+            if yesterday:
+                date_start = yesterday.strftime('%d.%m.%Y')
+            else:
+                date_start = today.strftime('%d.%m.%Y') 
         link = f'{self.root}webproc2_5_1_J?ses=10010&num_s=2&num=&date1={date_start}&date2={date_finish}&name_zp=&out_type=&id='
         return link
     

@@ -26,7 +26,7 @@ class KeyWords(Update):
             elif self.message == 'photophoto':
                 self.photo()
             else:
-                self.nak()
+                    self.nak()
         else:
             pass
 
