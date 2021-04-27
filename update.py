@@ -89,9 +89,16 @@ class Update:
             }
         requests.post(message_url, json=json_data)
         
-    def just_text(self, text):
-        json_data = {
-            "chat_id": self.chat_id,
-            "text": text
-        }
+    def just_text(self, text, chat=None):
+        if chat:
+
+            json_data = {
+                "chat_id": chat,
+                "text": text
+            }
+        else:
+            json_data = {
+                "chat_id": self.chat_id,
+                "text": text
+            }
         return json_data

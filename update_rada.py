@@ -57,7 +57,7 @@ class Rada(CheckNewBills):
         for i in self.with_tags:
             di = {'fields':{'link': i['link'], 'number':i['number'], 'date':i['date'], 'text':i['text'], 'tags':i['tags'], 'Choice':1}}
             dogs.append(di)
-        n.send_to_ninox(dogs, my_schema['links'])
+        n.send_to_ninox(dogs, n.schema()['links'])
         print(f'Выгружено {len(self.with_tags)} ссылок с тэгами')
         
     def send_no_files(self):
@@ -65,7 +65,7 @@ class Rada(CheckNewBills):
         for i in self.to_check:
             di = {'fields':{'link': i['link'], 'number':i['number'], 'date':i['date'], 'text':i['text'], 'Choice':2}}
             dogs.append(di)
-        n.send_to_ninox(dogs, my_schema['links'])
+        n.send_to_ninox(dogs, n.schema()['links'])
         print(f'Выгружено {len(self.to_check)} ссылок без файлов')
         
     def send_tags_in_name(self):
@@ -73,7 +73,7 @@ class Rada(CheckNewBills):
         for i in self.find_tag_in_name:
             di = {'fields':{'link': i['link'], 'number':i['number'], 'date':i['date'], 'text':i['text'], 'tags':i['tags'], 'Choice':3}}
             dogs.append(di)
-        n.send_to_ninox(dogs, my_schema['links'])
+        n.send_to_ninox(dogs, n.schema()['links'])
         print(f'Выгружено {len(self.find_tag_in_name)} ссылок с тегами в имени')
     
     def send_exceptions(self):   
@@ -81,7 +81,7 @@ class Rada(CheckNewBills):
         for i in self.exception_links:
             di = {'fields':{'link': i['link'], 'number':i['number'], 'date':i['date'], 'text':i['text'], 'Choice':4}}
             dogs.append(di)
-        n.send_to_ninox(dogs, my_schema['links'])
+        n.send_to_ninox(dogs, n.schema()['links'])
         print(f'Выгружено {len(self.exception_links)} ссылок с ошибками (ТАЙМАУТ)')
 
     def make_used_links(self):
@@ -90,13 +90,17 @@ class Rada(CheckNewBills):
             used_links.append(i['link'])                
         for i in self.with_tags:
             used_links.append(i['link'])
+        for i in self.to_check:
+            used_links.append(i['link'])
+        for i in self.exception_links:
+            used_links.append(i['link'])
 
         with open('used_links.txt', 'a') as f:
             f.writelines(used_links)
             f.close()
     
     def get_links_to_check(self):
-        today_table = n.get_from_ninox(my_schema['links'])
+        today_table = n.get_from_ninox(n.schema()['links'])
         list_to_check = today_table.loc[(today_table.Choice == 'no file') | (today_table.Choice == 'errors'), 'link'].to_list()
         short_table = today_table[['link','id']]
         self.dict_to_check = short_table.set_index('link').to_dict()['id']
@@ -105,17 +109,23 @@ class Rada(CheckNewBills):
 
     def check_from_list(self):
         my_list = self.get_links_to_check()
+        print(my_list)
         for i in my_list:
-            a = Analizator(i)
-            if a.status == 'ok':
-                n_id = self.dict_to_check[i]
-                if len(a.result) == 0:
-                    n.delete_record(my_schema['links'], n_id)
-                else:
-                    dogs = []
-                    di = {'id':n_id, 'fields':{'tags':a.result, 'Choice':1}}
-                    dogs.append(di)
-                    n.send_to_ninox(dogs, my_schema['links'])
+            print(i)
+            try:
+                a = Analizator(i)
+                print(a.status)
+                if a.status == 'ok':
+                    n_id = self.dict_to_check[i]
+                    if len(a.result) == 0:
+                        n.delete_record(n.schema()['links'], n_id)
+                    else:
+                        dogs = []
+                        di = {'id':n_id, 'fields':{'tags':a.result, 'Choice':1}}
+                        dogs.append(di)
+                        n.send_to_ninox(dogs, my_schema['links'])
+            except Exception as ex:
+                print(f'EXCEPTION : {ex}')
             else:
                 pass
 
@@ -149,11 +159,11 @@ sched = BlockingScheduler()
 def timed_job_day():
     Rada().timed_j()
     print('done')
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour='0')    
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour='12', minute=9)    
 def timed_job_midnight():
     Rada().timed_j(yesterday=True)
     
-@sched.scheduled_job('cron', day_of_week='mon-fri', hour=23, minute=59)
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=12, minute=22)
 def delete_file_content():
     Rada().check_from_list()
     with open('used_links.txt', 'w') as f:

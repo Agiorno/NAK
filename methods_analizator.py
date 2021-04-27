@@ -21,7 +21,7 @@ class AnalizatorMethod:
     root = 'http://w1.c1.rada.gov.ua/pls/zweb2/'
 
     def make_soup(self, link):
-        r = requests.get(link, timeout=1)
+        r = requests.get(link, timeout=5)
         soup = bs(r.text, 'html.parser')
         return soup
 
