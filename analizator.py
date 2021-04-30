@@ -3,7 +3,11 @@ from bs4 import BeautifulSoup as bs
 from methods_analizator import AnalizatorMethod
 from parsing_process import Parse
 
-
+"""
+Задача модуля последовательно запустить методы родительского класса и
+определить наличие файла на странице законопроекта, конвертировать его 
+в текст и прогнать на наличие тэгов. Выдает СТАТУС и СПИСОК НАЙДЕННЫХ ТЭГОВ.
+"""
 
 class Analizator(AnalizatorMethod):
     

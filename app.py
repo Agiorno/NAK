@@ -16,8 +16,8 @@ getWebhookInfo = f"{bot['BOT_URL']}getWebhookInfo"
 delete_webhook = f"{bot['BOT_URL']}deleteWebhook"
 r = requests.get(getWebhookInfo).json()
 print(r)
-print(set_webhook)
 if r['result']['url'] == '':
+    requests.get(delete_webhook)
     requests.get(set_webhook)
     print(r)
     

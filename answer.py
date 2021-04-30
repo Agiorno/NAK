@@ -1,7 +1,12 @@
 from analizator import Analizator
 from additional_bill_info import billProject
 from methods_analizator import AnalizatorMethod as am
-       
+import json
+
+"""
+Задача метода - сформировать обратный ответ на запрос проекта НАК на основе АНАЛИЗАТОРА ТЕКСТА
+
+"""
 
 class AnswerMethod:
 
@@ -38,6 +43,24 @@ class AnswerMethod:
 *Аналіз тегів*: ❌ Текст законопроекту відсутній. Ми щогодини оновлюємо інформацію та повідомимо вас, після аналізу тексту, якщо в ньому будуть знайдені ключові слова."""
         
         return my_message
+    
+    def wrong_request(self):
+        my_message = 'НЕКОРЕКТНИЙ ЗАПИТ'
+        
+        return my_message
+    
+    def make_inline_keyboard(self, empty=False, **kwargs):
+        if empty:
+            kb = json.dumps({ "inline_keyboard":[[]]})
+        else:
+            dogs = []
+            for arg in kwargs.values():
+                dogs.append(arg)
+            fa = []
+            fa.append(dogs)
+            ik = { "inline_keyboard":fa}
+            kb = json.dumps(ik)
+        return kb
 
 
 

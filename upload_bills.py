@@ -24,6 +24,7 @@ coms = coms.set_index('Name').to_dict()['id']
 mps = n.get_from_ninox(my_schema['mps'])[['full_name', 'id']]
 mps = mps.set_index('full_name').to_dict()['id']
 
+# добавляем законпроект в нинокс комплексно
 def send_info(link):
     my_schema = n.schema()
     my_list = ['Номер, дата реєстрації:', 'Редакція законопроекту:','Рубрика законопроекту:', "Суб'єкт права законодавчої ініціативи:",
@@ -105,16 +106,20 @@ def get_links(array):
     return d
 
 
+""" 
+Класс для работы с таблицей законопроектов (BILLS) в ниноксе. Проверяем наличие, вытаскиваем ссылки на страницы, 
+вытаскиваем резюме, как в прочем и любую инфу из карточки.
 
+"""
 class Bills():
     
     my_schema = n.schema()
     
     def __init__(self):
-        self.all_bills = n.get_from_ninox(self.my_schema['Bills'])
-        self.bills = self.all_bills[['Number', 'id']].dropna()
-        self.list_of_bills = self.bills['Number'].to_list()
-        self.bill_ids = self.bills.set_index('Number').to_dict()['id']  
+        self.all_bills = n.get_from_ninox(self.my_schema['Bills'])     # вытащили таблицу законопроектов из нинокс
+        self.bills = self.all_bills[['Number', 'id']].dropna()         # оставили только номера и айдишки
+        self.list_of_bills = self.bills['Number'].to_list()            # создали список номеров
+        self.bill_ids = self.bills.set_index('Number').to_dict()['id'] # создали словарь {номер: айди}
         
         
         
@@ -123,11 +128,12 @@ class Bills():
         q = self.all_bills.set_index('Number').copy()
         q.fillna('', inplace = True)
         resume = q.loc[q.index == bill, 'resume'][bill]
+        record_link = q.loc[q.index == bill, 'record_link'][bill]
         try:
             if resume == '':
-                return 'Знайдено картку законопроекту, проте *коментар відсутній*'
+                return f'Знайдено [картку законопроекту]({record_link}), проте *коментар відсутній*'
             else:
-                return resume
+                return f'Знайдено [картку законопроекту]({record_link}). Коментар: {resume}'
         except:
             return f'В базі знайдено більше одного законопроекту з номером {bill}. Видаліть непотрібний'
         
