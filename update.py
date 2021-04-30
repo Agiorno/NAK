@@ -79,12 +79,16 @@ class Update:
         self.response = requests.post(message_url, json=prepared_data)
         
         
-    def edit_reply(self):
+    def edit_reply(self, message_id = None, chat_id = None):
+        if not message_id:
+            message_id = self.message_id
+        if not chat_id:
+            chat_id = self.chat_id
         message_url = self.BOT_URL + 'editMessageReplyMarkup'
         kb = json.dumps({ "inline_keyboard":[[]]})
         json_data = {
-            "message_id": self.message_id,
-            "chat_id" : self.chat_id,
+            "message_id": message_id,
+            "chat_id" : chat_id,
             'reply_markup': kb
             }
         requests.post(message_url, json=json_data)
