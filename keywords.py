@@ -4,6 +4,7 @@ import sys
 import os
 from datetime import datetime
 from check_updates import CheckNewBills 
+import time
  
  
 class KeyWords(Update): 
