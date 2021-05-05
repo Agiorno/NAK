@@ -72,18 +72,28 @@ class Login(Permission, Update):
         self.db = self.client.Rada
         self.collection = self.db.BOT
         
-        
-        if self.permission_check(self.chat_id):
-            self.status = True
-        elif self.stranger_check(self.chat_id):
-            self.send_message(self.just_text('Запрос на авторизацию получен. Ожидайте.'))
-            self.status = False
-        else:
-            self.send_message(self.just_text('Запрос на авторизацию получен. Ожидайте.'))
-            for i in self.get_admins():
-                self.send_message(self.json_data(i))
-                print(f"{self.message_id} -- {i}")
-            self.status = False
+        if self.my_type == 'channel_post':
+            pass
+        elif self.my_type == 'my_chat_member':
+            if self.permission_check(self.from_id):
+                self.status = True
+            else:
+                self.leave_chat()
+                self.status = False
+
+        if self.my_type == 'message':
+
+            if self.permission_check(self.chat_id):
+                self.status = True
+            elif self.stranger_check(self.chat_id):
+                self.send_message(self.just_text('Запрос на авторизацию получен. Ожидайте.'))
+                self.status = False
+            else:
+                self.send_message(self.just_text('Запрос на авторизацию получен. Ожидайте.'))
+                for i in self.get_admins():
+                    self.send_message(self.json_data(i))
+                    print(f"{self.message_id} -- {i}")
+                self.status = False
 
 
     def json_data(self, chat_id):
