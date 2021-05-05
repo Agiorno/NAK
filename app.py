@@ -4,8 +4,8 @@ from update import Update
 from keywords import KeyWords
 import ast
 import ninox_log as nl
-
-
+from login import Login
+from answer import AnswerMethod
 
 with open("monkey", "r") as f:
     bot = ast.literal_eval(f.read())
@@ -45,14 +45,18 @@ class TelegramBot(Update, Bottle):
         self.data = bottle_request.json
         self.send_log()
         self.start()
+            
         print(f'Это новый запрос? : {self.update_id not in self.updated_id}')
         if self.update_id not in self.updated_id:
-            if self.message:
-                print(f"текст сообщения: {self.message}. Ушло на проверку ключевых слов.")
-                a = KeyWords(self.BOT_URL, self.data)
-            else:
-                print(f"текст сообщения отсутсвует")
-            self.updated_id.append(self.update_id)
+            log = Login(self.BOT_URL, self.data)
+            print(log.status)
+            if log.status:
+                if self.message:
+                    print(f"текст сообщения: {self.message}. Ушло на проверку ключевых слов.")
+                    a = KeyWords(self.BOT_URL, self.data)
+                else:
+                    print(f"текст сообщения отсутсвует")
+                self.updated_id.append(self.update_id)      
         else:
             pass
 

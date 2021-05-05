@@ -1,5 +1,6 @@
 from update import Update 
 from nak import NAK
+from login import Login
 import sys
 import os
 from datetime import datetime
@@ -26,6 +27,8 @@ class KeyWords(Update):
                 self.update_bills()
             elif self.message == 'photophoto':
                 self.photo()
+            elif self.message == '1auth' or self.message == '2auth':
+                self.login()
             else:
                     self.nak()
         else:
@@ -54,6 +57,10 @@ class KeyWords(Update):
     
     def nak(self):    
         nak = NAK(self.BOT_URL, self.data)
+
+    def login(self):
+        login = Login(self.BOT_URL, self.data)
+        login.answer()
     
     def photo(self):
  

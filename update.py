@@ -35,7 +35,9 @@ class Update:
             elif self.my_type == 'edited_message':
                 pass
             elif self.my_type == 'channel_post':
-                pass
+                self.message_id = self.data['channel_post']['message_id']
+                self.channel_id = self.data['channel_post']['sender_chat']['id']
+
             elif self.my_type == 'edited_channel_post':
                 pass
             elif self.my_type == 'inline_query':
@@ -53,7 +55,11 @@ class Update:
             elif self.my_type == 'poll_answer':
                 pass
             elif self.my_type == 'my_chat_member':
-                self.chat_id = self.data['my_chat_member']['chat']['id'] 
+                self.chat_id = self.data['my_chat_member']['chat']['id']
+                self.from_id = self.data['my_chat_member']['from']['id']
+                self.old_status = self.data['my_chat_member']['old_chat_member']['status']
+                self.old_user_id = self.data['my_chat_member']['old_chat_member']['user']['id']
+                self.new_status = self.data['my_chat_member']['new_chat_member']['status']
             else:
                 self.my_type ='error'
         except KeyError:
@@ -77,14 +83,25 @@ class Update:
     def send_message(self, prepared_data):
         message_url = self.BOT_URL + 'sendMessage'
         self.response = requests.post(message_url, json=prepared_data)
+
+    def leave_chat(self, prepared_data=None):
+        message_url = self.BOT_URL+'leaveChat'
+        if not prepared_data:
+            prepared_data = {
+                'chat_id':self.chat_id
+            }
+        self.response = requests.post(message_url, prepared_data)
         
-        
-    def edit_reply(self):
+    def edit_reply(self, message_id = None, chat_id = None):
+        if not message_id:
+            message_id = self.message_id
+        if not chat_id:
+            chat_id = self.chat_id
         message_url = self.BOT_URL + 'editMessageReplyMarkup'
         kb = json.dumps({ "inline_keyboard":[[]]})
         json_data = {
-            "message_id": self.message_id,
-            "chat_id" : self.chat_id,
+            "message_id": message_id,
+            "chat_id" : chat_id,
             'reply_markup': kb
             }
         requests.post(message_url, json=json_data)
