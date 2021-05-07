@@ -28,6 +28,19 @@ class Update:
                     self.message = 'mne prislali hernu'
                 self.chat_id = self.data['message']['chat']['id']
                 self.message_id = self.data['message']['message_id']
+                self.is_bot  = self.data['message']['from']['is_bot']
+                try:
+                    self.first_name = self.data['message']['from']['first_name']
+                except:
+                    self.first_name = ''
+                try:
+                    self.last_name = self.data['message']['from']['last_name']
+                except:
+                    self.last_name = ''
+                try:
+                    self.user_name = self.data['message']['from']['user_name']
+                except:
+                    self.user_name = ''
             elif self.my_type == 'callback_query':
                 self.chat_id = self.data['callback_query']['message']['chat']['id']
                 self.message = self.data['callback_query']['data']
