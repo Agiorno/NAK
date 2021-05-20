@@ -8,51 +8,44 @@ from check_updates import CheckNewBills
 import time
 from tags import Tags
 from users import User
+import requests
  
  
-class KeyWords(Update): 
+class KeyWords(): 
     now = datetime.now()
     timestamp = round(datetime.timestamp(now))
 
-    def __init__(self, bot_url, data):
-        self.data = data
-        self.start()
-        self.BOT_URL = bot_url
-        if self.update_id != self.last_update_id:
+    def check_keywords(self):
 
-            self.last_update_id = self.update_id
-            u = User()
-            u.chat_id = self.chat_id
-            scope = u.currentScope()
-            print(f'scope = {scope}')
-            if scope != 'general':
-                self.message = scope
-            
-            print(f"{self.message} = = '/tags': {self.message == '/tags'}")
-            
-            if self.message == 'restart':
-                print('перенаправили на Рестарт')
-                self.restart()
-            elif self.message == 'mne prislali hernu':
-                print('перенаправили на Херню')
-                self.hernia()
-            elif self.message == 'update bills':
-                print('перенаправили на ОБНОВЛЕНИЕ ЗАКОНОВ')
-                self.update_bills()
-            elif self.message == 'photophoto':
-                print('перенаправили на ФОТО')
-                self.photo()
-            elif self.message == '1auth' or self.message == '2auth':
-                print('перенаправили на ЛОГИН')
-                self.login()
-            elif self.message == '/tags':
-                print('перенаправили на ТЕГИ')
-                self.dialog_tag()
-            else:
-                print('перенаправили на НАК')
-                self.nak()
+        # u = User()
+        # u.chat_id = self.chat_id
+        scope = self.currentScope()
+        if scope != 'general':
+            self.message = scope
+        
+        print(f"{self.message} = = '/tags': {self.message == '/tags'}")
+        
+        if self.message == 'restart':
+            print('перенаправили на Рестарт')
+            self.restart()
+        elif self.message == 'mne prislali hernu':
+            print('перенаправили на Херню')
+            self.hernia()
+        elif self.message == 'update bills':
+            print('перенаправили на ОБНОВЛЕНИЕ ЗАКОНОВ')
+            self.update_bills()
+        elif self.message == 'photophoto':
+            print('перенаправили на ФОТО')
+            self.photo()
+        elif self.message == '1auth' or self.message == '2auth':
+            print('перенаправили на ЛОГИН')
+            self.login_answer()
+        elif self.message == '/tags':
+            print('перенаправили на ТЕГИ')
+            self.dialog_tag()
         else:
-            pass
+            print('перенаправили на НАК')
+            self.bot_analize_bills_for_nak()
 
 
     
@@ -68,22 +61,15 @@ class KeyWords(Update):
     
     def hernia(self):
         self.send_message(self.just_text('Шановні колеги, не балуйтесь. Які стікери?! Ви шо!! Використовуйте мене за призначенням'))
+    
+    def dialog_tag(self):
+        dialog = Tags(self.BOT_URL, self.data)
 
     def update_bills(self):
         self.send_message(self.just_text('починаемо перевірку нових законопроектів'))
         c = CheckNewBills()
         message = c.check_everything()
         self.send_message(self.just_text(message))
-    
-    def nak(self):    
-        nak = NAK(self.BOT_URL, self.data)
-
-    def login(self):
-        login = Login(self.BOT_URL, self.data)
-        login.answer()
-    
-    def dialog_tag(self):
-        dialog = Tags(self.BOT_URL, self.data)
     
     def photo(self):
  

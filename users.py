@@ -6,19 +6,10 @@ with open("monkey", "r") as f:
     bot = ast.literal_eval(f.read())
 
 class User():
-    
     client = MongoClient(bot['mongo'])
     db = client.Rada
     log = db.Log
     users = db.BOT
-    chat_id = None
-    
-    def userAlive(self):
-        try:
-            self.user = self.users.find_one({'chat_id':self.chat_id})
-            self.alive = True
-        except:
-            self.alive = False
 
     def currentScope(self):
         self.user = self.users.find_one({'chat_id':self.chat_id})
@@ -97,6 +88,18 @@ class User():
         _filter = {'chat_id':self.chat_id}
         value = {'$addToSet':{'tags':{name: values}}}
         self.db.BOT.update_one(_filter, value)
+
+    def options(self):
+        self.user = self.users.find_one({'chat_id':self.chat_id})
+        try:
+            self.option = self.user['options']
+        except:
+            _filter = {'chat_id':self.chat_id}
+            value = { "$set": { 'options': { 'CRM': False } } }
+            self.db.BOT.update_one(_filter, value)
+            self.option = { 'CRM': False } 
+        return self.option
+
 
 
         

@@ -1,32 +1,27 @@
 from ninox_log import send_log
 from upload_bills import get_links, send_info, Bills
-import json  
 from answer import Answer, AnswerMethod
-from update import Update
 
-class NAK(Update):
+
+class NAK():
     
-    def __init__(self, bot_url, data):
-        self.BOT_URL = bot_url #забрали ссылку на бота
-        self.data = data  #забрали входящий json
-        self.start()  #запустили парсинг json (Update.start)
-        self.bot_analize_bills_for_nak() #вернули ответ
-        
-
     
     #CRM answer
     def generate_keyboard(self, bill, my_answer):
-        
-        if str(self.message) in bill.list_of_bills:
-            self.text = bill.check_info(str(self.message))
-            self.kb = AnswerMethod().make_inline_keyboard(empty=True)
-        else:
-            self.text = "Цей законопроект відсутній в базі" 
-            self.kb=AnswerMethod().make_inline_keyboard(option1 = { "text": "Додати", "callback_data": "1" },
-                                              option2 = { "text": "Не додавати", "callback_data": "2" })
-        my_message = f'''{my_answer}
+        if self.options()['CRM']:
+            print(self.options())
+            if str(self.message) in bill.list_of_bills:
+                self.text = bill.check_info(str(self.message))
+                self.kb = AnswerMethod().make_inline_keyboard(empty=True)
+            else:
+                self.text = "Цей законопроект відсутній в базі" 
+                self.kb=AnswerMethod().make_inline_keyboard(option1 = { "text": "Додати", "callback_data": "1" },
+                                                option2 = { "text": "Не додавати", "callback_data": "2" })
 
-📍 *CRM*: {self.text}''' 
+        else:
+            print(self.options())
+            self.kb = AnswerMethod().make_inline_keyboard(empty=True)
+            my_message = my_answer
 
         return my_message
     
@@ -48,7 +43,7 @@ class NAK(Update):
 
         self.bill = Bills() # обновили список законопроектов
         
-        m = Answer(link) # сфорировали текст обратного ответа, на основе ссылки на законопроект в Раде
+        m = Answer(link, self.user['tags']) # сфорировали текст обратного ответа, на основе ссылки на законопроект в Раде
         my_answer = m.my_message
         self.my_answer = self.generate_keyboard(self.bill, my_answer) # подвезали к тексту клавиатуру, если нужно
 

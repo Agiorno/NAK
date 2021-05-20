@@ -3,15 +3,12 @@ import dns
 from update import Update
 from answer import AnswerMethod
 import ast
+from users import User
 
 with open("monkey", "r") as f:
     bot = ast.literal_eval(f.read())
 
 class Permission:
-    client = None
-    db = None
-    users = None
-    collection = None
         
     def accept_permission(self, chat_id,is_bot, first_name, last_name, user_name):
         doc = {'chat_id':chat_id, 'first_name': first_name, 'last_name': last_name, 'user_name':user_name, 'is_bot':is_bot, 'role':'user', 'permission':True, 'tags':[]}
@@ -37,6 +34,7 @@ class Permission:
         result = self.users.find_one({'permission': True, 'chat_id':chat_id})
         self.client.close()
         if result:
+            self.user = result
             return result['permission']
         else:
             return False
@@ -68,18 +66,11 @@ class Permission:
     
 
 
-class Login(Permission, Update):
-    client = MongoClient(bot['mongo'])
-    db = client.Rada
-    collection = db.Log
-    users = db.BOT
+class Login(Permission):
 
-    def __init__(self, bot_url, data):
-        self.data = data
-        self.BOT_URL = bot_url
-        self.send_log_mongo(data)
+    def check_login(self):
+        self.send_log_mongo(self.data)
         self.data.pop('_id')
-        self.start()
         
         if self.my_type == 'message':
 
@@ -133,7 +124,7 @@ class Login(Permission, Update):
         }
         return json_data
 
-    def answer(self):
+    def login_answer(self):
         if self.message == "1auth":
             chat_id = int(self.data['callback_query']['message']['text'].split("К нам стучится ")[1].split('.')[0])
             upd_id = int(self.data['callback_query']['message']['text'].split("Авторизовать? ")[1])
@@ -150,11 +141,11 @@ class Login(Permission, Update):
             print(self.get_users())
         # отказались
         else:
-            for i in self.get_admins():
-                self.send_message(self.simple_json(text=f'Новый пользователь {first_name} {last_name} послан на хуй', chat_id=i))
             upd_id = int(self.data['callback_query']['message']['text'].split("Авторизовать? ")[1])
             chat_id = int(self.data['callback_query']['message']['text'].split("К нам стучится ")[1].split('.')[0])
             is_bot, first_name, last_name, user_name = self.get_from_update_id(upd_id)
+            for i in self.get_admins():
+                self.send_message(self.simple_json(text=f'Новый пользователь {first_name} {last_name} послан на хуй', chat_id=i))
             self.pause_permission(chat_id, is_bot, first_name, last_name, user_name)
 
         
@@ -164,10 +155,10 @@ class Login(Permission, Update):
         print('[ЛОГИН]: КЛАВИАТУРА УДАЛЕНА')
         
     def send_log_mongo(self, data):
-        self.collection.insert_one(data)
+        self.log.insert_one(data)
 
     def get_from_update_id(self, update_id):
-        result = self.collection.find_one({'update_id': update_id})
+        result = self.log.find_one({'update_id': update_id})
         print(result)
         try:
             is_bot = result['message']['from']['is_bot']

@@ -1,12 +1,15 @@
+from users import User
 import requests
 from bottle import Bottle, response, request as bottle_request
 from update import Update
 from keywords import KeyWords
 import ast
 import ninox_log as nl
+
 from login import Login
 from answer import AnswerMethod
 from pymongo import MongoClient
+from nak import NAK
 
 with open("monkey", "r") as f:
     bot = ast.literal_eval(f.read())
@@ -23,10 +26,15 @@ if r['result']['url'] == '':
     print(r)
     
 
-class TelegramBot(Update, Bottle):  
+class TelegramBot(Update, Login, KeyWords, User,  NAK, Bottle):  
     
     updated_id = []
     BOT_URL = bot['BOT_URL']
+    client = MongoClient(bot['mongo'])
+    db = client.Rada
+    log = db.Log
+    users = db.BOT
+    user = None
 
     def __init__(self, *args, **kwargs):
         super(TelegramBot, self).__init__()
@@ -46,25 +54,16 @@ class TelegramBot(Update, Bottle):
     def post_handler(self):
         print('пришло сообщение')
         self.data = bottle_request.json
-        print(1)
-        print(self.data)
         self.send_log()
-        self.start()
+        self.start_update()
             
         print(f'Это новый запрос? : {self.update_id not in self.updated_id}')
         if self.update_id not in self.updated_id:
-            print(2)
-            print(self.data)
-            log = Login(self.BOT_URL, self.data)
-            print(log.status)
-            print(3)
-            print(self.data)
-            if log.status:
+            self.check_login()
+            if self.status:
                 if self.message:
                     print(f"текст сообщения: {self.message}. Ушло на проверку ключевых слов.")
-                    print(4)
-                    print(self.data)
-                    a = KeyWords(self.BOT_URL, self.data)
+                    self.check_keywords()
                 else:
                     print(f"текст сообщения отсутсвует")
                 self.updated_id.append(self.update_id)      
@@ -72,6 +71,7 @@ class TelegramBot(Update, Bottle):
             pass
         print(5)
         print(self.data)
+        print(f'user = {self.user}')
 
 
 

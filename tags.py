@@ -161,7 +161,7 @@ class Tags(User, Update):
     def __init__(self, BOT_URL, data):
         self.BOT_URL = BOT_URL
         self.data = data
-        self.start()
+        self.start_update()
         print(self.message)
         print('start handle_tags')
         self.handle_tags()

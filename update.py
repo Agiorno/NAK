@@ -9,10 +9,9 @@ class Update:
     last_update_id = 0
     message = None
     
-    def start(self):
+    def start_update(self):
         self.update_id = self.data['update_id']
         self.my_type = self.get_type(self.data)
-        print(f'type =  = {self.my_type}')
         self.handle_message(self.data)
  
     def get_type(self, val):
@@ -49,7 +48,7 @@ class Update:
                 pass
             elif self.my_type == 'channel_post':
                 self.message_id = self.data['channel_post']['message_id']
-                self.channel_id = self.data['channel_post']['sender_chat']['id']
+                self.chat_id = self.data['channel_post']['sender_chat']['id']
 
             elif self.my_type == 'edited_channel_post':
                 pass

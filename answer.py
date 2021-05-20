@@ -17,9 +17,9 @@ class AnswerMethod:
 
         else:
             my_message = f"""{self.info_message} 
-*Аналіз тегів*: ❗️❗️❗️  У законопроекті знайдені ключові слова: """
-            for i in self.answer.result:
-                my_message = f'{my_message}{i} '
+*Аналіз тегів*: ❗️❗️❗️  У законопроекті знайдені ключові слова: {self.answer.result}"""
+            # for i in self.answer.result:
+            #     my_message = f'{my_message}{i} '
         
         return my_message
     
@@ -66,10 +66,10 @@ class AnswerMethod:
 
 class Answer(AnswerMethod):
    
-    def __init__(self, link):
-        self.answer = Analizator(link)
+    def __init__(self, link, tags):
+        self.answer = Analizator(link, tags)
         self.law_name, self.law_number = am().get_atrrs(link)
-        self.info_message = info_message = f'''📑 *Номер*:  🔗[{self.law_number}]({link})
+        self.info_message = f'''📑 *Номер*:  🔗[{self.law_number}]({link})
         
 ✏️ *Назва*: {self.law_name}
 '''

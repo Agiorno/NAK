@@ -52,15 +52,6 @@ def send_log(data, answer, law_name, law_number, link):
     return result
 
 
-def send_file_to_check(array):
-
-    dogs = []
-    for i in array:
-        i.pop('tags')
-        di = {'fields':i}
-        dogs.append(di)
-    result = q.send_to_ninox(dogs, q_schema['PDF'])
-    return result
     
     
 

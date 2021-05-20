@@ -13,11 +13,9 @@ from striprtf.striprtf import rtf_to_text
 class AnalizatorMethod:
 
 
-    tag_file = 'tags'
-    with open(tag_file,'r') as f:
-        tags = f.read()
-    tags = tags.replace('\n',',').lower().strip().split(',')
    
+    tags = None
+
     root = 'http://w1.c1.rada.gov.ua/pls/zweb2/'
 
     def make_soup(self, link):
@@ -78,18 +76,22 @@ class AnalizatorMethod:
         return result
 
     def find_tags(self, text):
-        result = []
+        answer = ''
         for tag in self.tags:
-            position  = text.find(tag)
-            if position>=0:
-                
-                q = ''
-                for i in tag.split():
-                    q=q+i.capitalize()
-                tag = '#'+q.strip()
-                tag = tag.replace(tag[0], tag[0].lower(), 1)
-                result.append(tag)
-        return result
+            for k, v in tag.items():
+                arr1 = ''
+                for i in v:
+                    position  = text.find(i)
+                    if position>=0:
+                        tg = '#'+i.capitalize().strip()
+                        arr1  = f'{arr1} {tg} '
+                for i in arr1:
+                    part1 = f'Набор *{k}*: {arr1}'
+            try:
+                answer = f'{answer} {part1}'
+            except:
+                answer = ''
+        return answer
     
     def make_dict_from_name(self,tr,position):
         td = tr[position].find_all('td')
