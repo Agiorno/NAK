@@ -7,3 +7,4 @@ __*
 *.ipynb
 *.txt
 *.code-workspace
+.DS*

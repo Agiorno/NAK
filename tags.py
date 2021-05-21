@@ -305,25 +305,6 @@ class Tags(User, Update):
             keyboard.append(buttons)
             buttons = []
         return keyboard
-
-
-
-
-# class Dialog_tag(Tags, Update):
-#     def __init__(self, BOT_URL, data):
-#         self.BOT_URL = BOT_URL
-#         self.data = data
-#         self.start()
-#         self.get_tags(self.chat_id)
-#         print(self.tags)
-
-#         elif self.message == "1no_tag":
-            
-#         elif self.message == "2no_tag":
-#             pass
-#         elif self.message.find('_tag')>0:
-#             pass
-
     
 
 

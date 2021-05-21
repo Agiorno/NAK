@@ -93,6 +93,10 @@ class Answer(AnswerMethod):
 {billProject(link).chronology}
 
 {billProject(link).committee}'''
+        try:
+            self.txts = self.answer.texts
+        except:
+            self.txts = ''
             
     
     

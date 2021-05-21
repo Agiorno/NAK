@@ -20,14 +20,19 @@ class KeyWords():
         # u = User()
         # u.chat_id = self.chat_id
         scope = self.currentScope()
-        if scope != 'general':
+        if scope == '/tags':
             self.message = scope
         
         print(f"{self.message} = = '/tags': {self.message == '/tags'}")
         
+
+        
         if self.message == 'restart':
             print('перенаправили на Рестарт')
             self.restart()
+        elif self.scope  == '/nak':
+            print('перенаправили на НАК')
+            self.bot_analize_bills_for_nak()
         elif self.message == 'mne prislali hernu':
             print('перенаправили на Херню')
             self.hernia()
@@ -74,7 +79,7 @@ class KeyWords():
     def photo(self):
  
         domain = 'https://esp.ngrok.io/'
-        file_name = '4050_table.png'
+        file_name = 'uk.png'
         file_path = domain+file_name
         message = f'{self.BOT_URL}sendPhoto'
         # message_url = self.BOT_URL + 'sendMessage'

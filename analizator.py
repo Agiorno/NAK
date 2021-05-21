@@ -1,6 +1,7 @@
 from methods_analizator import AnalizatorMethod
 from parsing_process import Parse
 
+
 """
 Задача модуля последовательно запустить методы родительского класса и
 определить наличие файла на странице законопроекта, конвертировать его 
@@ -8,7 +9,6 @@ from parsing_process import Parse
 """
 
 class Analizator(AnalizatorMethod):
-    
     def __init__(self, link, tags):
         print(1)
         soup = self.make_soup(link)
@@ -29,6 +29,8 @@ class Analizator(AnalizatorMethod):
                 print(9)
                 self.result = self.find_tags(text)
                 print(10)
+                self.texts = text
+                print(35)
             else:
                 print(11)  
                 self.status = 'no_file'  

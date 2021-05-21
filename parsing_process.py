@@ -9,14 +9,14 @@ class Parse:
     
     def parse_docx(self, file):
         my_file = docx2txt.process('text.docx')
-        my_file = my_file.replace('\n',' ').replace('\t','').replace('\xa0','').lower()
+        my_file = my_file.replace('\n',' ').replace('\t','').replace('\xa0','').replace('’', "'").lower()
         os.remove('text.docx')
         return my_file
 
     def parse_pdf(self, file):
         parse('text.pdf', 'text.docx', start=1, end=None)
         my_file = docx2txt.process('text.docx')
-        my_file = my_file.replace('\n',' ').replace('\t','').replace('\xa0','').lower()
+        my_file = my_file.replace('\n',' ').replace('\t','').replace('\xa0','').replace('’', "'").lower()
         os.remove('text.docx')
         os.remove('text.pdf')
         return my_file
@@ -27,6 +27,7 @@ class Parse:
         a = codecs.encode(text, encoding='latin-1', errors='ignore')
         t = codecs.decode(a, encoding='cp1251')
         t = t.strip()
+        t = t.replace('’', "'").lower()
         os.remove('text.rtf')
         return t
 
